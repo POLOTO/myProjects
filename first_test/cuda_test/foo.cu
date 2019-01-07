@@ -1,0 +1,26 @@
+#include "foo.cuh"
+
+#define CHECK(res) { if(res != cudaSuccess){printf("Error ：%s:%d , ", __FILE__,__LINE__);   \
+printf("code : %d , reason : %s \n", res,cudaGetErrorString(res));exit(-1);}}
+
+__global__ void foo()
+{
+    printf("CUDA!\n");
+}
+
+
+void useCUDA()
+{
+    foo<<<1,4>>>();
+    CHECK(cudaDeviceSynchronize());
+
+    int dev = 0;
+    cudaDeviceProp devProp;
+    CHECK(cudaGetDeviceProperties(&devProp, dev));
+    std::cout << "SM的数量：" << devProp.multiProcessorCount << std::endl;
+    std::cout << "每个线程块的共享内存大小：" << devProp.sharedMemPerBlock / 1024.0 << " KB" << std::endl;
+    std::cout << "每个线程块的最大线程数：" << devProp.maxThreadsPerBlock << std::endl;
+    std::cout << "每个EM的最大线程数：" << devProp.maxThreadsPerMultiProcessor << std::endl;
+    std::cout << "每个EM的最大线程束数：" << devProp.maxThreadsPerMultiProcessor / 32 << std::endl;
+    std::cout << "使用GPU device " << dev << ": " << devProp.name << std::endl;
+}
